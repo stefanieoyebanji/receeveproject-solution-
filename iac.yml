@@ -148,13 +148,4 @@ Resources:
           Arn: !GetAtt MyFunction.Arn
 
 
-  Outputs:
-   FunctionArn:
-     Description: "ARN of the Lambda function"
-     Value: !Ref FunctionName
-   TableName:
-     Description: "Name of the DynamoDB table"
-     Value: !Ref TableName
-   BucketName:
-     Description: "Name of the S3 bucket"
-     Value: !Ref BucketName
+  
