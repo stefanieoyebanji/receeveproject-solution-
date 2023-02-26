@@ -132,7 +132,7 @@ Resources:
     Description: "DynamoDB table that stores the data to be exported to S3."
     Properties:
       BucketName:!Ref BucketName
-        VersioningConfiguration:
+      VersioningConfiguration:
         Status: Enabled
       Tags:
         - Key: "Owner"
