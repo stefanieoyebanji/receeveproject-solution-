@@ -1,4 +1,4 @@
-name: Cloudformation stack deployment 
+name: Export dynamodb data to S3 
 on:
   push:
     paths:
