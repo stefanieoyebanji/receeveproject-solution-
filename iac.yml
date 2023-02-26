@@ -149,19 +149,4 @@ Resources:
       Targets:
         - Id: "target-lambda"
           Arn: !GetAtt MyFunction.Arn
-  Outputs:
-    FunctionArn:
-      Description: "ARN of the Lambda function"
-      Value: !GetAtt MyFunction.Arn
-    RoleArn:
-      Description: "ARN of the IAM role"
-      Value: !GetAtt MyRole.Arn
-    TableName:
-      Description: "Name of the DynamoDB table"
-      Value: !Ref MyTable
-    BucketName:
-      Description: "Name of the S3 bucket"
-      Value: !Ref MyBucket
-    EventRuleArn:
-      Description: "ARN of the EventBridge rule"
-      Value: !GetAtt MyEventRule.Arn      
+    
