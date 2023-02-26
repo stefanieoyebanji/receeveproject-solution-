@@ -146,3 +146,16 @@ Resources:
       Targets:
         - Id: "target-lambda"
           Arn: !GetAtt MyFunction.Arn
+            
+  
+
+ Outputs:
+   FunctionArn:
+     Description: "ARN of the Lambda function"
+     Value: !GetAtt MyFunction.Arn
+   TableName:
+     Description: "Name of the DynamoDB table"
+     Value: !Ref TableName
+   BucketName:
+     Description: "Name of the S3 bucket"
+     Value: !Ref BucketName
