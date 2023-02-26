@@ -64,9 +64,9 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref TableName
-      TracingConfig:
-        Mode: Active
-      ReservedConcurrentExecutions: 1
+      
+        
+      
       
         
 
