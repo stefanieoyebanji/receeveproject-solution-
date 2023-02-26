@@ -151,7 +151,7 @@ Resources:
   Outputs:
    FunctionArn:
      Description: "ARN of the Lambda function"
-     Value: !GetAtt MyFunction.Arn
+     Value: !Ref FunctionName
    TableName:
      Description: "Name of the DynamoDB table"
      Value: !Ref TableName
