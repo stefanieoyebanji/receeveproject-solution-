@@ -66,8 +66,6 @@ Resources:
           TABLE_NAME: !Ref TableName
       TracingConfig:
         Mode: Active
-      Layers:
-        - !Ref MyLayer
       ReservedConcurrentExecutions: 1
       VersioningConfiguration:
         Enabled: true
