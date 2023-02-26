@@ -36,15 +36,13 @@ Resources:
             const AWS = require('aws-sdk');
             const dynamoDB = new AWS.DynamoDB();
             const s3 = new AWS.S3();
-            const tableName = !Ref TableName
-            const bucketName = !Ref BucketName
+            const tableName = process.env.TABLE_NAME;
+            const bucketName = process.env.BUCKET_NAME;
             const timestamp = new Date().toISOString();
             const key = `${tableName}-${timestamp}.json`;
-
             const scanParams = {
               TableName: tableName
             };
-
             try {
               const data = await dynamoDB.scan(scanParams).promise();
               const jsonData = JSON.stringify(data);
@@ -64,9 +62,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref TableName
-      
-        
-      
+          BUCKET_NAME: !Ref BucketName
       
         
 
