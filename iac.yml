@@ -3,15 +3,15 @@ Description: CloudFormation template for deploying a Lambda function that export
 Parameters:
   FunctionName:
     Type: String
-    Default: my-receevefunction
+    Default: receevefunction
     Description: Name for the Lambda function
   TableName:
     Type: String
-    Default: receeveproject-table
+    Default: receeveproject
     Description: Name for the DynamoDB table
   BucketName:
     Type: String
-    Default: receeveproject-bucket
+    Default: receeveproject
     Description: Name for the S3 bucket
   Owner:
     Type: String
@@ -117,18 +117,21 @@ Resources:
         WriteCapacityUnits: 5
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
-      Tags:
-        - Key: owner
-          Value: devops-team
-        - Key: project
-          Value: my-project
-        - Key: environment
-          Value: production
+        
+       Tags:
+        - Key: "Owner"
+          Value: !Ref Owner
+        - Key: "Project"
+          Value: !Ref Project
+        - Key: "Environment"
+          Value: !Ref Environment
+        
+        
   MyBucket:
     Type: AWS::S3::Bucket
     Description: "DynamoDB table that stores the data to be exported to S3."
     Properties:
-      BucketName: my-bucket
+      BucketName:!Ref BucketName
       VersioningConfiguration:
         Status: Enabled
       Tags:
