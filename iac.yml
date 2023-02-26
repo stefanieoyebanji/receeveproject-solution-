@@ -67,8 +67,8 @@ Resources:
       TracingConfig:
         Mode: Active
       ReservedConcurrentExecutions: 1
-      VersioningConfiguration:
-        Enabled: true
+      
+        
 
   MyRole:
     Type: AWS::IAM::Role
