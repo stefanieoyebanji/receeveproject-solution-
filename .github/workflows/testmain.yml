@@ -1,0 +1,160 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudFormation template for deploying a Lambda function that exports data from DynamoDB to S3 daily
+Parameters:
+  FunctionName:
+    Type: String
+    Default: receevefunction
+    Description: Name for the Lambda function
+  TableName:
+    Type: String
+    Default: receeveproject
+    Description: Name for the DynamoDB table
+  BucketName:
+    Type: String
+    Default: receeveproject
+    Description: Name for the S3 bucket
+  Owner:
+    Type: String
+    Default: "receeve"
+  Project:
+    Type: String
+    Default: "MyProject"
+  Environment:
+    Type: String
+    Default: "Dev"
+Resources:
+  MyFunction:
+    Type: AWS::Lambda::Function
+    Description: "Lambda function that exports data from DynamoDB to S3 daily."
+    Properties:
+      FunctionName: !Ref FunctionName
+      Handler: index.handler
+      Role: !GetAtt MyRole.Arn
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            const AWS = require('aws-sdk');
+            const dynamoDB = new AWS.DynamoDB();
+            const s3 = new AWS.S3();
+            const tableName = process.env.TABLE_NAME;
+            const bucketName = process.env.BUCKET_NAME;
+            const timestamp = new Date().toISOString();
+            const key = `${tableName}-${timestamp}.json`;
+            const scanParams = {
+              TableName: tableName
+            };
+            try {
+              const data = await dynamoDB.scan(scanParams).promise();
+              const jsonData = JSON.stringify(data);
+              const putParams = {
+                Bucket: bucketName,
+                Key: key,
+                Body: jsonData
+              };
+              await s3.putObject(putParams).promise();
+              console.log(`Exported ${tableName} to ${bucketName}/${key}`);
+            } catch (err) {
+              console.error(err);
+            }
+          };
+      Runtime: nodejs14.x
+      Timeout: 30
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+          BUCKET_NAME: !Ref BucketName
+      
+        
+
+  MyRole:
+    Type: AWS::IAM::Role
+    Description: "IAM role that grants permissions to the Lambda function to access DynamoDB and S3."
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "DynamoDBPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "dynamodb:Scan"
+                Resource: !GetAtt MyTable.Arn
+        - PolicyName: "S3Policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:PutObject"
+                Resource: !Sub "arn:aws:s3:::${BucketName}/*"
+
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Description: "DynamoDB table that stores the data to be exported to S3."
+    Properties:
+      TableName: !Ref TableName
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+        
+      Tags:
+        - Key: "Owner"
+          Value: !Ref Owner
+        - Key: "Project"
+          Value: !Ref Project
+        - Key: "Environment"
+          Value: !Ref Environment
+        
+        
+  MyBucket:
+    Type: AWS::S3::Bucket
+    Description: "DynamoDB table that stores the data to be exported to S3."
+    Properties:
+      BucketName: !Ref BucketName
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: "Owner"
+          Value: !Ref Owner
+        - Key: "Project"
+          Value: !Ref Project
+        - Key: "Environment"
+          Value: !Ref Environment
+  MyEventRule:
+    Type: AWS::Events::Rule
+    Description: "CloudWatch Events rule that triggers the Lambda function daily."
+    Properties:
+      Name: my-event-rule
+      ScheduleExpression: "cron(0 2 * * ? *)" # every day at 2:00 AM UTC
+      Targets:
+        - Id: "target-lambda"
+          Arn: !GetAtt MyFunction.Arn
+
+
+  Outputs:
+   FunctionArn:
+     Description: "ARN of the Lambda function"
+     Value: !GetAtt MyFunction.Arn
+   TableName:
+     Description: "Name of the DynamoDB table"
+     Value: !Ref TableName
+   BucketName:
+     Description: "Name of the S3 bucket"
+     Value: !Ref BucketName
