@@ -146,10 +146,9 @@ Resources:
       Targets:
         - Id: "target-lambda"
           Arn: !GetAtt MyFunction.Arn
-            
-  
 
- Outputs:
+
+  Outputs:
    FunctionArn:
      Description: "ARN of the Lambda function"
      Value: !GetAtt MyFunction.Arn
