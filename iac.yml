@@ -118,7 +118,7 @@ Resources:
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
         
-       Tags:
+      Tags:
         - Key: "Owner"
           Value: !Ref Owner
         - Key: "Project"
