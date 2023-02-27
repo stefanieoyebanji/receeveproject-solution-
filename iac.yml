@@ -190,7 +190,5 @@ Resources:
                   - "events:PutRule"
                   - "events:PutTargets"
                 Resource: "*"
-    
-
 
   
