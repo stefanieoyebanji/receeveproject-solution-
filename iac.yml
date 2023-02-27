@@ -107,13 +107,19 @@ Resources:
       KeySchema:
         - AttributeName: id
           KeyType: HASH
-      BillingMode: PROVISIONED
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       PointInTimeRecoverySpecification:
-        PointInTimeRecoveryEnabled: true
-        
+        PointInTimeRecoveryEnabled: true  
+      ExportSpecification:
+        ExportFormat: "DYNAMODB_JSON"
+        S3Bucket: !Ref BucketName
+        S3BucketOwner: my-account-id
+        S3Prefix: "exports/"
+        S3SseAlgorithm: "AES256"
+        StartTime: "2023-03-01T00:00:00.000Z"
+
       Tags:
         - Key: "Owner"
           Value: !Ref Owner
