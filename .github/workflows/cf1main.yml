@@ -1,0 +1,33 @@
+name: Export DynamoDB data to S3
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Add item to DynamoDB
+        run: |
+          aws dynamodb put-item \
+            --table-name receeveproject \
+            --item '{"id": {"S": "1"}, "name": {"S": "Test Item"}, "created_at": {"S": "2023-02-27T02:00:00.000Z"}}'
+
+      - name: Wait for DynamoDB Stream to trigger Lambda function
+        run: sleep 120
+
+      - name: Verify data in S3
+        run: |
+          aws s3 ls s3://receeveproject/
