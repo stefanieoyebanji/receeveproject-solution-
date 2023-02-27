@@ -40,9 +40,7 @@ Resources:
              // Event triggered by manual invocation
             // Perform other processing
            }
-           // ...
-         }
-
+           // ...}
           
             const AWS = require('aws-sdk');
             const dynamoDB = new AWS.DynamoDB();
@@ -67,7 +65,7 @@ Resources:
             } catch (err) {
               console.error(err);
             }
-          };
+          
       Runtime: nodejs14.x
       Timeout: 30
       Environment:
@@ -161,7 +159,7 @@ Resources:
         - Id: "target-lambda"
           Arn: !GetAtt MyFunction.Arn
   
-    LambdaExecutionRole:
+  LambdaExecutionRole:
     Type: "AWS::IAM::Role"
     Properties:
       AssumeRolePolicyDocument:
