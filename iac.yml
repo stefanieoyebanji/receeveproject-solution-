@@ -24,34 +24,34 @@ Parameters:
     Default: "Dev"
 Resources:
   MyFunction:
-  Type: AWS::Lambda::Function
-  Description: "Lambda function that exports data from DynamoDB to S3 daily."
-  Properties:
-    FunctionName: !Ref FunctionName
-    Handler: index.handler
-    Role: !GetAtt MyRole.Arn
-    Code:
-      ZipFile: |
-        const AWS = require('aws-sdk');
-        const dynamoDB = new AWS.DynamoDB();
-        const s3 = new AWS.S3();
-        const tableName = process.env.TABLE_NAME;
-        const bucketName = process.env.BUCKET_NAME;
-        const timestamp = new Date().toISOString();
-        const key = `${tableName}-${timestamp}.json`;
+    Type: AWS::Lambda::Function
+    Description: "Lambda function that exports data from DynamoDB to S3 daily."
+    Properties:
+      FunctionName: !Ref FunctionName
+      Handler: index.handler
+      Role: !GetAtt MyRole.Arn
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          const dynamoDB = new AWS.DynamoDB();
+          const s3 = new AWS.S3();
+          const tableName = process.env.TABLE_NAME;
+          const bucketName = process.env.BUCKET_NAME;
+          const timestamp = new Date().toISOString();
+          const key = `${tableName}-${timestamp}.json`;
         
-        exports.handler = async (event, context) => {
-          if (event.source === "aws.events") {
-            // Event triggered by EventBridge rule
-            // Perform export to S3
-          } else {
-            // Event triggered by manual invocation
-            // Perform other processing
-          }
+          exports.handler = async (event, context) => {
+            if (event.source === "aws.events") {
+              // Event triggered by EventBridge rule
+             // Perform export to S3
+            } else {
+              // Event triggered by manual invocation
+             // Perform other processing
+           }
           
-          const scanParams = {
+           const scanParams = {
             TableName: tableName
-          };
+           };
           
           try {
             const data = await dynamoDB.scan(scanParams).promise();
