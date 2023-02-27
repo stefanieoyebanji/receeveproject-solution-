@@ -24,54 +24,57 @@ Parameters:
     Default: "Dev"
 Resources:
   MyFunction:
-    Type: AWS::Lambda::Function
-    Description: "Lambda function that exports data from DynamoDB to S3 daily."
-    Properties:
-      FunctionName: !Ref FunctionName
-      Handler: index.handler
-      Role: !GetAtt MyRole.Arn
-      Code:
-        ZipFile: |
-          exports.handler = async (event, context) => {
-           if (event.source === "aws.events") {
-             // Event triggered by EventBridge rule
+  Type: AWS::Lambda::Function
+  Description: "Lambda function that exports data from DynamoDB to S3 daily."
+  Properties:
+    FunctionName: !Ref FunctionName
+    Handler: index.handler
+    Role: !GetAtt MyRole.Arn
+    Code:
+      ZipFile: |
+        const AWS = require('aws-sdk');
+        const dynamoDB = new AWS.DynamoDB();
+        const s3 = new AWS.S3();
+        const tableName = process.env.TABLE_NAME;
+        const bucketName = process.env.BUCKET_NAME;
+        const timestamp = new Date().toISOString();
+        const key = `${tableName}-${timestamp}.json`;
+        
+        exports.handler = async (event, context) => {
+          if (event.source === "aws.events") {
+            // Event triggered by EventBridge rule
             // Perform export to S3
-           } else {
-             // Event triggered by manual invocation
+          } else {
+            // Event triggered by manual invocation
             // Perform other processing
-           }
-           // ...}
+          }
           
-            const AWS = require('aws-sdk');
-            const dynamoDB = new AWS.DynamoDB();
-            const s3 = new AWS.S3();
-            const tableName = process.env.TABLE_NAME;
-            const bucketName = process.env.BUCKET_NAME;
-            const timestamp = new Date().toISOString();
-            const key = `${tableName}-${timestamp}.json`;
-            const scanParams = {
-              TableName: tableName
+          const scanParams = {
+            TableName: tableName
+          };
+          
+          try {
+            const data = await dynamoDB.scan(scanParams).promise();
+            const jsonData = JSON.stringify(data);
+            const putParams = {
+              Bucket: bucketName,
+              Key: key,
+              Body: jsonData
             };
-            try {
-              const data = await dynamoDB.scan(scanParams).promise();
-              const jsonData = JSON.stringify(data);
-              const putParams = {
-                Bucket: bucketName,
-                Key: key,
-                Body: jsonData
-              };
-              await s3.putObject(putParams).promise();
-              console.log(`Exported ${tableName} to ${bucketName}/${key}`);
-            } catch (err) {
-              console.error(err);
-            }
-          
+            await s3.putObject(putParams).promise();
+            console.log(`Exported ${tableName} to ${bucketName}/${key}`);
+          } catch (err) {
+            console.error(err);
+          }
+        };
       Runtime: nodejs14.x
       Timeout: 30
       Environment:
         Variables:
           TABLE_NAME: !Ref TableName
           BUCKET_NAME: !Ref BucketName
+
+  
       
         
 
