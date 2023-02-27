@@ -1,0 +1,30 @@
+const AWS = require('aws-sdk');
+AWS.config.update({region: 'us-east-1'});
+
+const lambda = new AWS.Lambda();
+const functionName = 'receevefunction';
+const bucketName = 'receeveproject';
+const eventName = 's3:ObjectCreated:*';
+const lambdaArn = `arn:aws:lambda:us-east-1:201036260658:function:${functionName}`;
+
+const params = {
+  Bucket: bucketName,
+  NotificationConfiguration: {
+    LambdaFunctionConfigurations: [
+      {
+        Events: [eventName],
+        LambdaFunctionArn: lambdaArn,
+      },
+    ],
+  },
+};
+
+const s3 = new AWS.S3();
+s3.putBucketNotificationConfiguration(params, function (err, data) {
+  if (err) {
+    console.error(`Error adding S3 event trigger to ${functionName}: ${err}`);
+  } else {
+    console.log(`S3 event trigger added to ${functionName}`);
+  }
+});
+
