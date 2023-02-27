@@ -112,12 +112,12 @@ Resources:
         WriteCapacityUnits: 5
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true  
-      ExportConfig:
+      ExportSpecification:
         ExportFormat: "DYNAMODB_JSON"
         S3Bucket: !Ref BucketName
-        S3BucketOwner: my-aws-account-id
-        S3Prefix: "exports/"
-        S3SseAlgorithm: "AES256"
+        S3BucketOwner: 05838bccc7e3645f4680aea63d51802e12c6b84d13ae31012451310e58497ac3
+        S3Prefix: "exports/!Ref TableName"
+        
         
 
       Tags:
