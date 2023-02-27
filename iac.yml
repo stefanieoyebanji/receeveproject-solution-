@@ -107,16 +107,12 @@ Resources:
       KeySchema:
         - AttributeName: id
           KeyType: HASH
+      BillingMode: PROVISIONED
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       PointInTimeRecoverySpecification:
-        PointInTimeRecoveryEnabled: true  
-      ExportSpecification:
-        ExportFormat: "DYNAMODB_JSON"
-        S3Bucket: !Ref BucketName
-        S3BucketOwner: 05838bccc7e3645f4680aea63d51802e12c6b84d13ae31012451310e58497ac3
-        S3Prefix: "exports/!Ref TableName"
+        PointInTimeRecoveryEnabled: true
         
         
 
