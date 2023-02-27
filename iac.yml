@@ -11,7 +11,7 @@ Parameters:
     Description: Name for the DynamoDB table
   BucketName:
     Type: String
-    Default: receeveproject
+    Default: receeve-bucket
     Description: Name for the S3 bucket
   Owner:
     Type: String
@@ -32,7 +32,18 @@ Resources:
       Role: !GetAtt MyRole.Arn
       Code:
         ZipFile: |
-          exports.handler = async (event) => {
+          exports.handler = async (event, context) => {
+           if (event.source === "aws.events") {
+             // Event triggered by EventBridge rule
+            // Perform export to S3
+           } else {
+             // Event triggered by manual invocation
+            // Perform other processing
+           }
+           // ...
+         }
+
+          
             const AWS = require('aws-sdk');
             const dynamoDB = new AWS.DynamoDB();
             const s3 = new AWS.S3();
@@ -95,6 +106,7 @@ Resources:
                 Action:
                   - "s3:PutObject"
                 Resource: !Sub "arn:aws:s3:::${BucketName}/*"
+        
 
   MyTable:
     Type: AWS::DynamoDB::Table
@@ -148,6 +160,36 @@ Resources:
       Targets:
         - Id: "target-lambda"
           Arn: !GetAtt MyFunction.Arn
+  
+    LambdaExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: "LambdaAccessS3AndEventBridge"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:*"
+                Resource:
+                  - "arn:aws:s3:::receeve-bucket/*"
+              - Effect: "Allow"
+                Action:
+                  - "events:PutEvents"
+                  - "events:PutRule"
+                  - "events:PutTargets"
+                Resource: "*"
+    
 
 
   
